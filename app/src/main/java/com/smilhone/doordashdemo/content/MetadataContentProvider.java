@@ -14,6 +14,7 @@ import com.smilhone.doordashdemo.common.CursorUtils;
 import com.smilhone.doordashdemo.database.LocationsDBHelper;
 import com.smilhone.doordashdemo.database.MetadataDatabase;
 import com.smilhone.doordashdemo.database.RestaurantListDBHelper;
+import com.smilhone.doordashdemo.database.RestaurantsDBHelper;
 import com.smilhone.doordashdemo.transport.DataFetcher;
 import com.smilhone.doordashdemo.transport.DataWriter;
 import com.smilhone.doordashdemo.transport.RefreshManager;
@@ -65,7 +66,7 @@ public class MetadataContentProvider extends ContentProvider {
     public static Uri getRestaurantPropertyUri(long restRowId) {
         return new Uri.Builder().scheme("content")
                                 .authority(Contract.AUTHORITY)
-                                .appendPath(Contract.LOCATION)
+                                .appendPath(Contract.RESTAURANT)
                                 .appendPath(String.valueOf(restRowId))
                                 .appendPath(Contract.PROPERTY)
                                 .build();
@@ -84,29 +85,34 @@ public class MetadataContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
                         @Nullable String[] selectionARgs, @Nullable String sortOrder) {
         int match = sUriMatcher.match(uri);
+        Cursor result = null;
         switch (match) {
             case LOCATION_PROPERTY : {
-                Cursor cursor = getLocationPropertyCursorAndScheduleRefresh(uri);
-                if (cursor != null) {
-                    cursor.setNotificationUri(getContext().getContentResolver(), uri);
-                }
-                return cursor;
-            }
-            case LOCATION_LIST : {
-                Cursor cursor = getLocationPropertyCursorAndScheduleRefresh(uri);
-                if (cursor != null && cursor.moveToFirst()) {
-                    return getLocationListCursor(cursor);
+                result = getLocationPropertyCursorAndScheduleRefresh(uri);
+                if (result != null) {
+                    result.setNotificationUri(getContext().getContentResolver(), Uri.parse(Contract.FLAT_NOTIFICATION_URI));
                 }
                 break;
             }
+            case LOCATION_LIST : {
+                Cursor propertyCursor = getLocationPropertyCursorAndScheduleRefresh(uri);
+                if (propertyCursor != null && propertyCursor.moveToFirst()) {
+                    result = getLocationListCursor(propertyCursor);
+                    if (result != null) {
+                        result.setNotificationUri(getContext().getContentResolver(), Uri.parse(Contract.FLAT_NOTIFICATION_URI));
+                    }
+                }
+                CursorUtils.closeQuietly(propertyCursor);
+                break;
+            }
             case RESTAURANT_PROPERTY : {
-
+                result = null;
                 break;
             }
             default:
                 return null;
         }
-        return null;
+        return result;
     }
 
     @Nullable
@@ -141,7 +147,7 @@ public class MetadataContentProvider extends ContentProvider {
                 SQLiteDatabase db = MetadataDatabase.getInstance(getContext()).getWritableDatabase();
                 int rowsUpdated = LocationsDBHelper.updateRow(db, contentValues, latitude, longitude);
                 if (rowsUpdated > 0) {
-                    getContext().getContentResolver().notifyChange(uri, null);
+                    getContext().getContentResolver().notifyChange(Uri.parse(Contract.FLAT_NOTIFICATION_URI), null);
                 }
                 return rowsUpdated;
             }
@@ -150,7 +156,12 @@ public class MetadataContentProvider extends ContentProvider {
                 return 0;
             }
             case RESTAURANT_PROPERTY : {
-
+                SQLiteDatabase db = MetadataDatabase.getInstance(getContext()).getWritableDatabase();
+                long restRowId = Long.parseLong(uri.getPathSegments().get(1));
+                int rowsUpdated = RestaurantsDBHelper.updateRestuarant(db, contentValues, restRowId);
+                if (rowsUpdated > 0) {
+                    getContext().getContentResolver().notifyChange(Uri.parse(Contract.FLAT_NOTIFICATION_URI), null);
+                }
                 break;
             }
             default:
@@ -240,5 +251,7 @@ public class MetadataContentProvider extends ContentProvider {
         public static final String RESTAURANT = "restaurant";
         public static final String LATITUDE = "lat";
         public static final String LONGITUDE = "lng";
+
+        public static final String FLAT_NOTIFICATION_URI = "content://" + AUTHORITY  + "/" + "allItems";
     }
 }

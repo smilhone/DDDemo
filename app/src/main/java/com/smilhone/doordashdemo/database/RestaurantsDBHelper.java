@@ -27,10 +27,10 @@ public class RestaurantsDBHelper extends BaseDBHelper {
         }
     }
 
-    public static long findRestaurantRowId(SQLiteDatabase db, long restId) {
+    public static long findRestaurantRowId(SQLiteDatabase db, long restRowId) {
         long rowId = BaseDBHelper.ROW_NOT_FOUND;
         final String selection = MetadataDatabase.RestaurantsTableColumns.REST_ID + " = ?";
-        final String[] selectionArgs = {String.valueOf(restId)};
+        final String[] selectionArgs = {String.valueOf(restRowId)};
         final String[] projection = {MetadataDatabase.PropertyTableColumns.ID};
         Cursor cursor = null;
         try {
@@ -43,5 +43,11 @@ public class RestaurantsDBHelper extends BaseDBHelper {
             CursorUtils.closeQuietly(cursor);
         }
         return rowId;
+    }
+
+    public static int updateRestuarant(SQLiteDatabase db, ContentValues values, long restRowId) {
+        final String whereClause = MetadataDatabase.RestaurantsTableColumns.REST_ID + " = ?";
+        final String[] whereClauseArgs = {String.valueOf(restRowId)};
+        return db.update(MetadataDatabase.RESTAURANTS_TABLE_NAME, values, whereClause, whereClauseArgs);
     }
 }

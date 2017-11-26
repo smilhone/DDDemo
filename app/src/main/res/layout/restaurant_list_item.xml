@@ -1,30 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:id="@+id/restaurant_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="6dp"
+    android:layout_marginTop="6dp">
+
+    <ImageView
+        android:id="@+id/restaurant_thumbnail"
+        android:layout_width="80dp"
+        android:layout_height="41dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
         android:id="@+id/restaurant_name"
-        android:textSize="12sp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:layout_marginBottom="6dp"
-        android:layout_marginEnd="6dp"
-        android:layout_marginStart="6dp"
-        android:textColor="#FFFFFF"
-        tools:text="Restaurant name"/>
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:maxLines="1"
+        app:layout_constraintLeft_toRightOf="@+id/restaurant_thumbnail"
+        app:layout_constraintEnd_toStartOf="@+id/favorite_button"
+        tools:text="Restaurant name" />
 
     <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
         android:id="@+id/restaurant_description"
-        android:textSize="12sp"
-        android:layout_marginBottom="6dp"
-        android:layout_marginEnd="6dp"
-        android:layout_marginStart="6dp"
-        android:textColor="#FFFFFF"
-        tools:text="Description"/>
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:ellipsize="end"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:maxLines="1"
+        app:layout_constraintLeft_toRightOf="@+id/restaurant_thumbnail"
+        app:layout_constraintTop_toBottomOf="@+id/restaurant_name"
+        app:layout_constraintEnd_toStartOf="@+id/favorite_button"
+        tools:text="Description" />
 
+    <CheckBox
+        android:id="@+id/favorite_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="12dp"
+        android:layout_marginEnd="24dp"
+        android:background="@null"
+        android:contentDescription="mark as favorite"
+        android:button="@android:drawable/btn_star"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textSize="12sp"
+        android:maxLines="2"
+        app:layout_constraintTop_toBottomOf="@id/favorite_button"
+        app:layout_constraintStart_toStartOf="@id/favorite_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="status"/>
 </android.support.constraint.ConstraintLayout>

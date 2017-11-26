@@ -29,7 +29,8 @@ public class RestaurantListDBHelper extends BaseDBHelper {
             MetadataDatabase.RestaurantsTableColumns.PRICE_RANGE,
             MetadataDatabase.RestaurantsTableColumns.IS_NEWLY_ADDED,
             MetadataDatabase.RestaurantsTableColumns.NUM_RATINGS,
-            MetadataDatabase.RestaurantsTableColumns.IS_TIME_SURGING
+            MetadataDatabase.RestaurantsTableColumns.IS_TIME_SURGING,
+            MetadataDatabase.RestaurantsTableColumns.STATUS
     };
 
     static {
@@ -149,7 +150,7 @@ public class RestaurantListDBHelper extends BaseDBHelper {
                                                   MetadataDatabase.RestaurantListTableColumns.RESTAURANT_ID);
         String selection = MetadataDatabase.RestaurantListTableColumns.LOCATION_ID + " = ?";
         String[] selectionArgs = {String.valueOf(locationRowId)};
-        String orderBy = MetadataDatabase.RestaurantsTableColumns.IS_FAVORITE;
+        String orderBy = MetadataDatabase.RestaurantsTableColumns.IS_FAVORITE + " DESC";
         return db.query(tableName, projectionToUse, selection, selectionArgs, "", "", orderBy);
     }
 }

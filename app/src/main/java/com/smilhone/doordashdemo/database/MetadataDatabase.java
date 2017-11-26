@@ -39,7 +39,8 @@ public class MetadataDatabase extends SQLiteOpenHelper {
                     RestaurantsTableColumns.PRICE_RANGE + " " + SQL_TYPE_INT + ", " +
                     RestaurantsTableColumns.COVER_IMG_URL + " " + SQL_TYPE_TEXT + ", " +
                     RestaurantsTableColumns.IS_NEWLY_ADDED + " " + SQL_TYPE_BOOLEAN + ", " +
-                    RestaurantsTableColumns.IS_TIME_SURGING + " " + SQL_TYPE_BOOLEAN;
+                    RestaurantsTableColumns.IS_TIME_SURGING + " " + SQL_TYPE_BOOLEAN + ", " +
+                    RestaurantsTableColumns.STATUS + " " + SQL_TYPE_TEXT;
 
     private static final String RESTAURANT_LIST_TABLE_COLUMNS =
             RestaurantListTableColumns.LOCATION_ID + " " + SQL_TYPE_INT + ", " +
@@ -132,6 +133,7 @@ public class MetadataDatabase extends SQLiteOpenHelper {
         public static final String PRICE_RANGE = "priceRange";
         public static final String IS_NEWLY_ADDED = "isNewlyAdded";
         public static final String IS_TIME_SURGING = "isTimeSurging";
+        public static final String STATUS = "status";
     }
 
     public static class RestaurantListTableColumns {

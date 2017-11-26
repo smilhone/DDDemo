@@ -3,4 +3,5 @@
     <item type="id" name="metadata_restaurant_list_cursor_id"/>
     <item type="id" name="metadata_restaurant_proprty_cursor_id"/>
     <item type="id" name="metadata_restaurant_property_cursor"/>
+    <item type="id" name="tag_adapter_position"/>
 </resources>

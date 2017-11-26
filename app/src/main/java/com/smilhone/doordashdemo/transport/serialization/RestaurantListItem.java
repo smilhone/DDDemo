@@ -55,6 +55,7 @@ public class RestaurantListItem {
         values.put(MetadataDatabase.RestaurantsTableColumns.IS_TIME_SURGING, IsTimeSurging);
         values.put(MetadataDatabase.RestaurantsTableColumns.NUM_RATINGS, NumberOfRatings);
         values.put(MetadataDatabase.RestaurantsTableColumns.PRICE_RANGE, PriceRange);
+        values.put(MetadataDatabase.RestaurantsTableColumns.STATUS, Status);
 
         return values;
     }
