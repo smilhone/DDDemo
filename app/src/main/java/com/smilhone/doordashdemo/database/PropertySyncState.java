@@ -31,6 +31,7 @@ public enum PropertySyncState {
 
     /**
      * Constructor.
+     *
      * @param syncState The sync state.
      */
     PropertySyncState(int syncState) {
@@ -57,6 +58,11 @@ public enum PropertySyncState {
         }
     }
 
+    /**
+     * Gets the integer value.
+     *
+     * @return The integer value for the PropertySyncState enum.
+     */
     public Integer integerValue() {
         return mSyncState;
     }

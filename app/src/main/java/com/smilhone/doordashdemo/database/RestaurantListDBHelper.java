@@ -34,21 +34,12 @@ public class RestaurantListDBHelper extends BaseDBHelper {
     };
 
     static {
+        // Create a projection for the restaurant - restaurant_list inner join.
         addColumnsToLookup(MetadataDatabase.RESTAURANTS_TABLE_NAME, RESTAURANTS_COLUMNS_IN_PROJECTION,
                            RESTAURANTS_LIST_PROJECTION_COLUMN_LOOKUP);
         RESTAURANTS_RESTAURANT_LIST_PROJECTION = new String[RESTAURANTS_LIST_PROJECTION_COLUMN_LOOKUP.size()];
         RESTAURANTS_LIST_PROJECTION_COLUMN_LOOKUP.values()
                                                  .toArray(RESTAURANTS_RESTAURANT_LIST_PROJECTION);
-    }
-
-    private static void addColumnsToLookup(final String tableName, final String[] columns, Map<String, String> lookup) {
-        for (final String column : columns) {
-            lookup.put(column, getQualifiedName(tableName, column));
-        }
-    }
-
-    private static String getQualifiedName(final String tableName, final String columnName) {
-        return tableName + "." + columnName + " AS " + columnName;
     }
 
     /**

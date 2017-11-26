@@ -8,42 +8,47 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.smilhone.doordashdemo.adapters.RestaurantListAdapter;
 import com.smilhone.doordashdemo.content.MetadataContentProvider;
 import com.smilhone.doordashdemo.database.MetadataDatabase;
 import com.smilhone.doordashdemo.viewmodels.RestaurantListViewModel;
+import com.smilhone.doordashdemo.viewmodels.RestaurantListViewState;
 
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private RestaurantListAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     private FavoriteButtonListener mFavoriteButtonListener = new FavoriteButtonListener();
+    private ProgressBar mLoadingProgressBar;
+    private TextView mErrorMessageTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        mLoadingProgressBar = findViewById(R.id.loading_spinner);
+        mErrorMessageTextView = findViewById(R.id.error_message);
+        mRecyclerView = findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // create adapter.
         mAdapter = new RestaurantListAdapter();
         mAdapter.setFavoriteButtonListener(mFavoriteButtonListener);
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), mLayoutManager.getOrientation()));
 
         RestaurantListViewModel viewModel = ViewModelProviders.of(this).get(RestaurantListViewModel.class);
         viewModel.getListCursor().observe(this, new Observer<Cursor>() {
@@ -52,7 +57,32 @@ public class MainActivity extends AppCompatActivity {
                 mAdapter.swapCursor(cursor);
             }
         });
-        viewModel.query(getApplicationContext(), getLoaderManager());
+
+        viewModel.getViewState().observe(this, new Observer<RestaurantListViewState>() {
+            @Override
+            public void onChanged(@Nullable RestaurantListViewState restaurantListViewState) {
+                if (restaurantListViewState != null) {
+                    switch (restaurantListViewState) {
+                        case LOADING:
+                            mRecyclerView.setVisibility(View.INVISIBLE);
+                            mErrorMessageTextView.setVisibility(View.INVISIBLE);
+                            mLoadingProgressBar.setVisibility(View.VISIBLE);
+                            break;
+                        case SHOW_EMPTY_MESSAGE:
+                            mRecyclerView.setVisibility(View.INVISIBLE);
+                            mErrorMessageTextView.setVisibility(View.VISIBLE);
+                            mLoadingProgressBar.setVisibility(View.INVISIBLE);
+                            break;
+                        case SHOW_LIST:
+                            mRecyclerView.setVisibility(View.VISIBLE);
+                            mErrorMessageTextView.setVisibility(View.INVISIBLE);
+                            mLoadingProgressBar.setVisibility(View.INVISIBLE);
+                            break;
+                    }
+                }
+            }
+        });
+        viewModel.query(getLoaderManager());
     }
 
     private class FavoriteButtonListener implements OnFavoriteButtonListener {

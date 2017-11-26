@@ -158,7 +158,7 @@ public class MetadataContentProvider extends ContentProvider {
             case RESTAURANT_PROPERTY : {
                 SQLiteDatabase db = MetadataDatabase.getInstance(getContext()).getWritableDatabase();
                 long restRowId = Long.parseLong(uri.getPathSegments().get(1));
-                int rowsUpdated = RestaurantsDBHelper.updateRestuarant(db, contentValues, restRowId);
+                int rowsUpdated = RestaurantsDBHelper.updateRestaurant(db, contentValues, restRowId);
                 if (rowsUpdated > 0) {
                     getContext().getContentResolver().notifyChange(Uri.parse(Contract.FLAT_NOTIFICATION_URI), null);
                 }
@@ -187,8 +187,9 @@ public class MetadataContentProvider extends ContentProvider {
         Double longitude = Double.parseDouble(uri.getQueryParameter(Contract.LONGITUDE));
 
         Cursor cursor = getLocationPropertyCursor(latitude, longitude);
-
-        boolean refreshSchedule = RefreshManager.getInstance().scheduleRefresh(getLocationRefreshTask(cursor, latitude, longitude), uri, this);
+        // Use a property uri for refreshing the list of restaurants so the sync state gets updated correctly.
+        Uri refreshUri = getLocationPropertyUri(latitude, longitude);
+        boolean refreshSchedule = RefreshManager.getInstance().scheduleRefresh(getLocationRefreshTask(cursor, latitude, longitude), refreshUri, this);
 
         if (refreshSchedule) {
             CursorUtils.closeQuietly(cursor);

@@ -5,16 +5,20 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 /**
+ * Database Helper methods for the locations table.
+ *
  * Created by smilhone on 11/20/2017.
  */
 
 public class LocationsDBHelper extends BaseDBHelper {
     /**
      * Updates the location record for the given latitude/longitude.
+     *
      * @param db The database to use.
      * @param location The values to update.
      * @param latitude The latitude for the location.
      * @param longitude The longitude for the location.
+     *
      * @return The number of rows updated.
      */
     public static int updateRow(SQLiteDatabase db, ContentValues location, double latitude, double longitude) {
@@ -26,10 +30,12 @@ public class LocationsDBHelper extends BaseDBHelper {
 
     /**
      * Gets a property cursor for the requested location.
+     *
      * @param db The database to use.
      * @param latitude The latitude of the location.
      * @param longitude The longitude of the location.
-     * @return
+     *
+     * @return A property cursor for the location.
      */
     public static Cursor getPropertyCursor(SQLiteDatabase db, double latitude, double longitude) {
         String selection = MetadataDatabase.LocationsTableColumns.LATITUDE + " = ? AND " +
@@ -38,6 +44,14 @@ public class LocationsDBHelper extends BaseDBHelper {
         return db.query(MetadataDatabase.LOCATIONS_TABLE_NAME, null, selection, selectionArgs, "", "", "");
     }
 
+    /**
+     * Inserts a record into the locations table.
+     * @param db The database to use.
+     * @param latitude The location's latitude.
+     * @param longitude The location's longitude.
+     *
+     * @return The rowId of the inserted record.
+     */
     public static long insertRow(SQLiteDatabase db, double latitude, double longitude) {
         ContentValues location = new ContentValues();
         location.put(MetadataDatabase.LocationsTableColumns.LATITUDE, latitude);

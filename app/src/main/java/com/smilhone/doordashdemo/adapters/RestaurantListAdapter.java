@@ -80,12 +80,22 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAd
         return mCursor != null ? mCursor.getCount() : 0;
     }
 
+    /**
+     * Swaps the cursor on the adapter.
+     *
+     * @param cursor The new cursor to use.
+     */
     public void swapCursor(Cursor cursor) {
         loadColumnIndices(cursor);
         mCursor = cursor;
         notifyDataSetChanged();
     }
 
+    /**
+     * Loads the column indices to avoid unnecessary look-ups later.
+     *
+     * @param cursor The cursor to load from.
+     */
     private void loadColumnIndices(Cursor cursor) {
         if (cursor != null) {
             mRestaurantNameColumnIndex = cursor.getColumnIndex(MetadataDatabase.RestaurantsTableColumns.NAME);
