@@ -18,12 +18,19 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
+ * RestaurantListDataFetcher loads the list of restaurants for a given location.
+ *
  * Created by stephmil on 11/20/2017.
  */
 
 public class RestaurantListDataFetcher implements DataFetcher {
     private ContentValues mLocationToRefresh;
 
+    /**
+     * Constructor.
+     *
+     * @param locationToRefresh The location to refresh.  Must contain the location's longitude/latitude.
+     */
     public RestaurantListDataFetcher(ContentValues locationToRefresh) {
         mLocationToRefresh = locationToRefresh;
     }
@@ -41,6 +48,18 @@ public class RestaurantListDataFetcher implements DataFetcher {
         service.getRestaurantList(latitutde, longitude).enqueue(new RestaurantListCallback(callback));
     }
 
+    /**
+     * Gets the OkHttp client.
+     * @return
+     */
+    private OkHttpClient getOkHttpClient() {
+        final OkHttpClient httpClient = new OkHttpClient();
+        return httpClient;
+    }
+
+    /**
+     * Callback for the network task fetching the list of restaurants.
+     */
     class RestaurantListCallback implements Callback<List<RestaurantListItem>> {
         private DataFetcherCallback mCallback;
         RestaurantListCallback(DataFetcherCallback callback) {
@@ -50,11 +69,14 @@ public class RestaurantListDataFetcher implements DataFetcher {
         @Override
         public void onResponse(Call<List<RestaurantListItem>> call, Response<List<RestaurantListItem>> response) {
             List<RestaurantListItem> restaurants = response.body();
-            List<ContentValues> children = new ArrayList<>(restaurants.size());
-            for(RestaurantListItem restaurant : restaurants) {
-                ContentValues child = restaurant.toContentValues();
-                if (child != null) {
-                    children.add(child);
+            List<ContentValues> children = new ArrayList<>();
+
+            if (restaurants != null) {
+                for (RestaurantListItem restaurant : restaurants) {
+                    ContentValues child = restaurant.toContentValues();
+                    if (child != null) {
+                        children.add(child);
+                    }
                 }
             }
             FetchedData fetchedData = new FetchedData(mLocationToRefresh, children, false);
@@ -65,10 +87,5 @@ public class RestaurantListDataFetcher implements DataFetcher {
         public void onFailure(Call<List<RestaurantListItem>> call, Throwable t) {
             mCallback.failure(t);
         }
-    }
-
-    private OkHttpClient getOkHttpClient() {
-        final OkHttpClient httpClient = new OkHttpClient();
-        return httpClient;
     }
 }

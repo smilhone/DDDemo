@@ -1,9 +1,10 @@
 package com.smilhone.doordashdemo.transport;
 
 /**
+ * RefreshTask is responsible for refreshing data.
+ *
  * Created by smilhone on 11/21/2017.
  */
-
 public class RefreshTask {
     private DataFetcher mDataFetcher;
     private DataWriter mDataWriter;

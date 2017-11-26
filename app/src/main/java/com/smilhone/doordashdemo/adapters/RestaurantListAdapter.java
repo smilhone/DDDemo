@@ -8,14 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.smilhone.doordashdemo.OnFavoriteButtonListener;
 import com.smilhone.doordashdemo.R;
-import com.smilhone.doordashdemo.common.CursorUtils;
 import com.smilhone.doordashdemo.database.MetadataDatabase;
 
 import java.lang.ref.WeakReference;
@@ -36,10 +34,18 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAd
     private View.OnClickListener mOnButtonClickListener = new OnFavoriteButtonClick();
     private WeakReference<OnFavoriteButtonListener> mFavoriteButtonListener;
 
+    /**
+     * Sets the FavoriteButtonListener.  RestaurantListAdapter holds a weak reference to it.
+     *
+     * @param listener The FavoriteButtonListener
+     */
     public void setFavoriteButtonListener(OnFavoriteButtonListener listener) {
-        mFavoriteButtonListener = new WeakReference<OnFavoriteButtonListener>(listener);
+        mFavoriteButtonListener = new WeakReference<>(listener);
     }
 
+    /**
+     * Gets the FavoriteButtonListener.
+     */
     public OnFavoriteButtonListener getFavoriteButtonListener() {
         return mFavoriteButtonListener == null ? null : mFavoriteButtonListener.get();
     }
@@ -48,6 +54,17 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAd
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.restaurant_list_item, parent, false);
         return new ViewHolder(view);
+    }
+
+    /**
+     * Swaps the cursor on the adapter.
+     *
+     * @param cursor The new cursor to use.
+     */
+    public void swapCursor(Cursor cursor) {
+        loadColumnIndices(cursor);
+        mCursor = cursor;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -62,33 +79,22 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAd
         holder.mStatusTextView.setText(mCursor.getString(mStatusColumnIndex));
         holder.mParentView.setTag(R.id.tag_adapter_position, mCursor.getPosition());
 
-        holder.mFavoriteButtom.setOnClickListener(mOnButtonClickListener);
+        holder.mFavoriteButtonCheckBox.setOnClickListener(mOnButtonClickListener);
         Integer isFavorite = mCursor.getInt(mCursor.getColumnIndex(MetadataDatabase.RestaurantsTableColumns.IS_FAVORITE));
-        holder.mFavoriteButtom.setChecked(isFavorite != 0);
+        holder.mFavoriteButtonCheckBox.setChecked(isFavorite != 0);
 
         Glide.with(holder.mImageView.getContext()).load(mCursor.getString(mCoverImgUrlColumnIndex)).into(holder.mImageView);
     }
 
     @Override
     public void onViewRecycled(ViewHolder viewHolder) {
-        viewHolder.mFavoriteButtom.setOnClickListener(null);
+        viewHolder.mFavoriteButtonCheckBox.setOnClickListener(null);
         Glide.clear(viewHolder.mImageView);
     }
 
     @Override
     public int getItemCount() {
         return mCursor != null ? mCursor.getCount() : 0;
-    }
-
-    /**
-     * Swaps the cursor on the adapter.
-     *
-     * @param cursor The new cursor to use.
-     */
-    public void swapCursor(Cursor cursor) {
-        loadColumnIndices(cursor);
-        mCursor = cursor;
-        notifyDataSetChanged();
     }
 
     /**
@@ -111,7 +117,7 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAd
         TextView mRestaurantDescriptionTextView;
         TextView mStatusTextView;
         ImageView mImageView;
-        CheckBox mFavoriteButtom;
+        CheckBox mFavoriteButtonCheckBox;
         View mParentView;
 
         ViewHolder(View itemView) {
@@ -122,13 +128,17 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAd
             mRestaurantDescriptionTextView = itemView.findViewById(R.id.restaurant_description);
             mImageView = itemView.findViewById(R.id.restaurant_thumbnail);
             mStatusTextView = itemView.findViewById(R.id.status);
-            mFavoriteButtom = itemView.findViewById(R.id.favorite_button);
+            mFavoriteButtonCheckBox = itemView.findViewById(R.id.favorite_button);
         }
     }
 
+    /**
+     * Click listener for the favorite check box.
+     */
     private class OnFavoriteButtonClick implements View.OnClickListener {
         @Override
         public void onClick(View view) {
+            // Find the parent item.  The cursor's position was stored there.
             View parentItem = findParentWithId(view, R.id.restaurant_item);
             if (parentItem != null) {
                 int adapterPosition = (Integer) parentItem.getTag(R.id.tag_adapter_position);
@@ -143,6 +153,14 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAd
             }
         }
 
+        /**
+         * Searches up the visual tree looking for the given id.
+         *
+         * @param view The view to search.
+         * @param id The id to search for.
+         *
+         * @return The View for the given id, null if it wasn't found as a parent to 'view'.
+         */
         private View findParentWithId(View view, int id) {
             View result = view;
             while (result != null && result.getId() != id && result.getParent() instanceof View) {

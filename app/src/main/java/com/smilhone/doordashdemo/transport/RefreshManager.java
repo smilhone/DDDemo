@@ -20,6 +20,10 @@ public class RefreshManager {
     private static RefreshManager sInstance;
     private Map<String, RefreshTask> mRunningRefreshTasks = new HashMap<>();
 
+    /**
+     * Gets the singleton instance of RefreshManager.
+     * @return
+     */
     public static RefreshManager getInstance() {
         synchronized (sLockObject) {
             if (sInstance == null) {
@@ -31,10 +35,12 @@ public class RefreshManager {
 
     /**
      * Schedules the refresh task if one isn't already running.
+     *
      * @param refreshTask The refresh task to schedule.
      * @param uriToNotify The content Uri to notify when the refresh completes.
      * @param contentProvider The ContentProvider to update when the refresh completes.
-     * @return
+     *
+     * @return True if the refresh was scheduled, false otherwise.
      */
     public boolean scheduleRefresh(RefreshTask refreshTask, Uri uriToNotify, ContentProvider contentProvider) {
         if (refreshTask == null) {
@@ -44,6 +50,7 @@ public class RefreshManager {
         boolean scheduleRefresh = false;
         String refreshTaskKey = refreshTask.getRefreshTaskKey();
         synchronized (sLockObject) {
+            // Only schedule a refresh if one isn't already running for the same key.
             if (!mRunningRefreshTasks.containsKey(refreshTaskKey)) {
                 scheduleRefresh = true;
                 mRunningRefreshTasks.put(refreshTaskKey, refreshTask);
@@ -53,6 +60,7 @@ public class RefreshManager {
         if (scheduleRefresh) {
             refreshTask.refresh(new RefreshManagerCallback(refreshTaskKey, uriToNotify, contentProvider));
 
+            // After scheduling the refresh, update the property columns for the item being refreshed.
             ContentValues values = new ContentValues();
             values.put(MetadataDatabase.PropertyTableColumns.LAST_SYNC_TIME, System.currentTimeMillis());
             values.put(MetadataDatabase.PropertyTableColumns.SYNC_STATUS, PropertySyncState.REFRESHING.integerValue());
@@ -61,11 +69,21 @@ public class RefreshManager {
         return scheduleRefresh;
     }
 
+    /**
+     * Callback implementation of RefreshTask.RefreshTaskCallback.
+     */
     private class RefreshManagerCallback implements RefreshTask.RefreshTaskCallback {
         private String mRefreshTaskKey;
         private Uri mUriToNotify;
         private ContentProvider mContentProvider;
 
+        /**
+         * Constructor.
+         *
+         * @param refreshTaskKey The key for the refresh task.
+         * @param uriToNotify The Uri to update when the refresh task finishes.
+         * @param contentProvider The content provider to update.
+         */
         RefreshManagerCallback(String refreshTaskKey, Uri uriToNotify, ContentProvider contentProvider) {
             mRefreshTaskKey = refreshTaskKey;
             mUriToNotify = uriToNotify;

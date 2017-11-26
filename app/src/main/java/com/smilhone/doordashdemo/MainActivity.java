@@ -24,7 +24,6 @@ import com.smilhone.doordashdemo.viewmodels.RestaurantListViewModel;
 import com.smilhone.doordashdemo.viewmodels.RestaurantListViewState;
 
 public class MainActivity extends AppCompatActivity {
-
     private RecyclerView mRecyclerView;
     private RestaurantListAdapter mAdapter;
     private FavoriteButtonListener mFavoriteButtonListener = new FavoriteButtonListener();
