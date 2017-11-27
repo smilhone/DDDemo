@@ -18,15 +18,19 @@ import java.util.List;
  */
 
 public class LocationsDataWriter implements DataWriter {
+    private MetadataDatabase mDatabase;
     private ContentValues mItemToUpdate;
     private long mLocationRowId;
     private final String TAG = LocationsDataWriter.class.getName();
 
     /**
      * Constructor.
+     *
+     * @param database The database to use.
      * @param itemToUpdate The item being refreshed.  This should be a row from the locations table.
      */
-    public LocationsDataWriter(ContentValues itemToUpdate) {
+    public LocationsDataWriter(MetadataDatabase database, ContentValues itemToUpdate) {
+        mDatabase = database;
         mItemToUpdate = itemToUpdate;
         mLocationRowId = mItemToUpdate.getAsLong(MetadataDatabase.PropertyTableColumns.ID);
     }
@@ -42,8 +46,7 @@ public class LocationsDataWriter implements DataWriter {
 
     @Override
     public void writeData(DataFetcher.FetchedData data) {
-        // TODO: Update access mechanism for this.  DataWriter should have access to an object which exposes the database, don't rely on it already being created.
-        SQLiteDatabase db = MetadataDatabase.getInstance(null).getWritableDatabase();
+        SQLiteDatabase db = mDatabase.getWritableDatabase();
         try {
             db.beginTransactionNonExclusive();
             ContentValues itemToUpdate = data.getItemToUpdate();

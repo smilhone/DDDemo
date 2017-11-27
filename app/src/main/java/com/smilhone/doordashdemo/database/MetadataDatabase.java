@@ -22,9 +22,9 @@ public class MetadataDatabase extends SQLiteOpenHelper {
     private static final String SQL_TYPE_BOOLEAN = "BOOLEAN";
     private static final String SQL_TYPE_REAL = "REAL";
 
-    protected static final String RESTAURANTS_TABLE_NAME = "restaurants";
-    protected static final String RESTAURANT_LIST_TABLE_NAME = "restaurant_list";
-    protected static final String LOCATIONS_TABLE_NAME = "locations";
+    public static final String RESTAURANTS_TABLE_NAME = "restaurants";
+    public static final String RESTAURANT_LIST_TABLE_NAME = "restaurant_list";
+    public static final String LOCATIONS_TABLE_NAME = "locations";
 
     private static final String LOCATIONS_TABLE_COLUMNS =
             LocationsTableColumns.LONGITUDE + " " + SQL_TYPE_REAL + ", " +

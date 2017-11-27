@@ -43,6 +43,14 @@ public class MetadataContentProvider extends ContentProvider {
         sUriMatcher.addURI(Contract.AUTHORITY, Contract.RESTAURANT + "/#/" + Contract.PROPERTY, RESTAURANT_PROPERTY);
     }
 
+    /**
+     * Gets a property uri for a location defined by the given latitude and longitude.
+     *
+     * @param latitude The latitude of the location.
+     * @param longitude The longitude of the location.
+     *
+     * @return A Uri to get a property cursor for the location.
+     */
     public static Uri getLocationPropertyUri(double latitude, double longitude) {
         return new Uri.Builder().scheme("content")
                                 .authority(Contract.AUTHORITY)
@@ -53,6 +61,14 @@ public class MetadataContentProvider extends ContentProvider {
                                 .build();
     }
 
+    /**
+     * Gets a list uri for a location defined by the given latitude and longitude.
+     *
+     * @param latitude The latitude of the location.
+     * @param longitude The longitude of the location.
+     *
+     * @return A Uri to get a list cursor for the location.
+     */
     public static Uri getLocationListUri(double latitude, double longitude) {
         return new Uri.Builder().scheme("content")
                                 .authority(Contract.AUTHORITY)
@@ -63,6 +79,11 @@ public class MetadataContentProvider extends ContentProvider {
                                 .build();
     }
 
+    /**
+     * Gets a property cursor for the given restaurant, defined by the REST_ID.
+     * @param restRowId
+     * @return
+     */
     public static Uri getRestaurantPropertyUri(long restRowId) {
         return new Uri.Builder().scheme("content")
                                 .authority(Contract.AUTHORITY)
@@ -232,7 +253,7 @@ public class MetadataContentProvider extends ContentProvider {
         ContentValues location = new ContentValues();
         DatabaseUtils.cursorRowToContentValues(locationCursor, location);
         DataFetcher dataFecther = new RestaurantListDataFetcher(location);
-        DataWriter dataWriter = new LocationsDataWriter(location);
+        DataWriter dataWriter = new LocationsDataWriter(MetadataDatabase.getInstance(getContext()), location);
         String refreshTaskKey = "location_" + String.valueOf(latitude) + "," + String.valueOf(longitude);
         return new RefreshTask(dataFecther, dataWriter, refreshTaskKey);
     }
