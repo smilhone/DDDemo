@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="Discover">
+            android:label="DoorDash Demo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
