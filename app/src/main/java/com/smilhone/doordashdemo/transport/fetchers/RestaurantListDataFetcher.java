@@ -1,16 +1,23 @@
 package com.smilhone.doordashdemo.transport.fetchers;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
 
+import com.smilhone.doordashdemo.Constants;
 import com.smilhone.doordashdemo.database.MetadataDatabase;
 import com.smilhone.doordashdemo.transport.DataFetcher;
 import com.smilhone.doordashdemo.transport.DoorDashService;
 import com.smilhone.doordashdemo.transport.serialization.RestaurantListItem;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,14 +32,17 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RestaurantListDataFetcher implements DataFetcher {
     private ContentValues mLocationToRefresh;
+    private Context mContext;
 
     /**
      * Constructor.
      *
+     * @param context
      * @param locationToRefresh The location to refresh.  Must contain the location's longitude/latitude.
      */
-    public RestaurantListDataFetcher(ContentValues locationToRefresh) {
+    public RestaurantListDataFetcher(Context context, ContentValues locationToRefresh) {
         mLocationToRefresh = locationToRefresh;
+        mContext = context;
     }
 
     @Override
@@ -53,7 +63,20 @@ public class RestaurantListDataFetcher implements DataFetcher {
      * @return
      */
     private OkHttpClient getOkHttpClient() {
-        final OkHttpClient httpClient = new OkHttpClient();
+        final OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(
+                new Interceptor() {
+                    @Override
+                    public okhttp3.Response intercept(Chain chain) throws IOException {                    
+				        SharedPreferences preferences = mContext.getSharedPreferences(Constants.SHARED_PREFEREENCES_KEY, Context.MODE_PRIVATE);
+				        String authToken = preferences.getString(Constants.AUTH_TOKEN_KEY, "");
+
+                        Request newRequest = chain.request().newBuilder().addHeader(
+                                URLEncoder.encode("JWT {Token}"), authToken).build();
+
+                        return chain.proceed(newRequest);
+                    }
+                }).build();
+
         return httpClient;
     }
 

@@ -252,7 +252,7 @@ public class MetadataContentProvider extends ContentProvider {
     private RefreshTask getLocationRefreshTask(Cursor locationCursor, double latitude, double longitude) {
         ContentValues location = new ContentValues();
         DatabaseUtils.cursorRowToContentValues(locationCursor, location);
-        DataFetcher dataFecther = new RestaurantListDataFetcher(location);
+        DataFetcher dataFecther = new RestaurantListDataFetcher(getContext(), location);
         DataWriter dataWriter = new LocationsDataWriter(MetadataDatabase.getInstance(getContext()), location);
         String refreshTaskKey = "location_" + String.valueOf(latitude) + "," + String.valueOf(longitude);
         return new RefreshTask(dataFecther, dataWriter, refreshTaskKey);

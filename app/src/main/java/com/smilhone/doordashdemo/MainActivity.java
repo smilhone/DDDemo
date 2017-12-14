@@ -4,6 +4,8 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,6 +36,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFEREENCES_KEY, MODE_PRIVATE);
+
+        if (!sharedPreferences.contains(Constants.AUTH_TOKEN_KEY)) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            getApplicationContext().startActivity(intent);
+        }
 
         mLoadingProgressBar = findViewById(R.id.loading_spinner);
         mErrorMessageTextView = findViewById(R.id.error_message);
